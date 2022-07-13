@@ -5,29 +5,29 @@
  * Date: 13/07/2022
  */
 
-// dependencies
+/* dependencies */
 const http = require('http');
 
-// app object - module scaffolding
+/* app object - module scaffolding */
 const app = {};
 
-// configuration
+/* configuration */
 app.config = {
     port: 3000
 };
 
-// create server
+/* create server */
 app.createServer = () => {
     http.createServer(app.handleReqRes).listen(app.config.port, () => {
         console.log(`Project server listening on port ${app.config.port}`);
     })
 }
 
-// handle request response
+/* handle request response */
 app.handleReqRes = (req, res) => {
     // response handled
     res.end('Project server connected successfully!')
 }
 
-// start the server
+/* start the server */
 app.createServer();
