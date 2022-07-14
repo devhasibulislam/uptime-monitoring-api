@@ -21,7 +21,7 @@ const app = {};
 //     id: 1935202062,
 //     dept: "CSE",
 // }, err => {
-//     console.log(`error is ${err}`);
+//     console.log(err);
 // })
 
 // !# able to read a file
@@ -30,9 +30,13 @@ const app = {};
 // })
 
 // !# able to update a file
-// data.update('', 'test', { institute: 'City University' }, err => {
-//     console.log(`error is ${err}`);
-// })
+// data.update('', 'test', {
+//     institute: 'City University',
+//     established: 2010,
+//     location: 'Ashulia, Khagan, Dhaka'
+// }, err => {
+//     console.log(err);
+// });
 
 // !# able to delete an existing file
 // data.delete('', 'test', err => {
