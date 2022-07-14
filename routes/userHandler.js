@@ -134,7 +134,76 @@ handle._user.get = (requestProperties, callBack) => {
 
 };
 
-handle._user.put = (requestProperties, callBack) => { };
+handle._user.put = (requestProperties, callBack) => {
+    // approaching first name
+    const firstName = typeof requestProperties.userInfo.firstName === 'string'
+        && requestProperties.userInfo.firstName.trim().length > 0
+        ? requestProperties.userInfo.firstName
+        : null;
+
+    // approaching last name
+    const lastName = typeof requestProperties.userInfo.lastName === 'string'
+        && requestProperties.userInfo.lastName.trim().length > 0
+        ? requestProperties.userInfo.lastName
+        : null;
+
+    // approaching phone number
+    const phoneNumber = typeof requestProperties.userInfo.phoneNumber === 'string'
+        && requestProperties.userInfo.phoneNumber.trim().length === 11
+        ? requestProperties.userInfo.phoneNumber
+        : null;
+
+    // approaching password
+    const password = typeof requestProperties.userInfo.password === 'string'
+        && requestProperties.userInfo.password.trim().length > 0
+        ? requestProperties.userInfo.password
+        : null;
+
+    // validate phone number
+    if (phoneNumber) {
+        // scope to find out update scheme
+        if (firstName || lastName || password) {
+            // lookup file from user
+            data.read('', phoneNumber, (error, userData) => {
+                const user = { ...parseJSON(userData) };
+                if (!error && user) {
+                    if (firstName) {
+                        user.firstName = firstName;
+                    }
+                    if (lastName) {
+                        user.lastName = lastName;
+                    }
+                    if (password) {
+                        user.password = hash(password);
+                    }
+
+                    // store in db
+                    data.update('', phoneNumber, user, err => {
+                        if (!err) {
+                            callBack(200, {
+                                message: "user updated successfully"
+                            })
+                        } else {
+                            callBack(500, {
+                                message: 'error occurs in server side'
+                            })
+                        }
+                    })
+                } else {
+                    callBack(401, 'user info integration invalid')
+                }
+            })
+        } else {
+            callBack(401, {
+                message: 'update scheme not valid'
+            })
+        }
+    } else {
+        callBack(400, {
+            message: 'invalid phone number'
+        })
+    }
+};
 
 handle._user.delete = (requestProperties, callBack) => { };
 
