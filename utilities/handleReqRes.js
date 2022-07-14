@@ -22,7 +22,7 @@ handler.handleReqRes = (req, res) => {
     const parsedURL = url.parse(req.url, true);
 
     // get full path
-    const path = parsedURL.path;
+    const path = parsedURL.pathname;
 
     // trim unwanted front and back froward slash of a path
     const trimmedPath = path.replace(/^\/+|\/+$/g, '');
