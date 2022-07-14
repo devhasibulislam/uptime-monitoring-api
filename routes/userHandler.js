@@ -205,7 +205,40 @@ handle._user.put = (requestProperties, callBack) => {
     }
 };
 
-handle._user.delete = (requestProperties, callBack) => { };
+handle._user.delete = (requestProperties, callBack) => {
+    // approaching phone number
+    const phoneNumber = typeof requestProperties.queryStringObject.phoneNumber === 'string'
+        && requestProperties.queryStringObject.phoneNumber.trim().length === 11
+        ? requestProperties.queryStringObject.phoneNumber
+        : null;
+
+    // validate with phone number to delete
+    if(phoneNumber){
+        data.read('', phoneNumber, (error, user)=>{
+            if(!error && user){
+                data.delete('', phoneNumber, err =>{
+                    if(!err){
+                        callBack(200, {
+                            message: 'user deletion success'
+                        })
+                    } else{
+                        callBack(401, {
+                            message: 'credential error'
+                        })
+                    }
+                })
+            } else{
+                callBack(500, {
+                    message: 'server side error'
+                })
+            }
+        })
+    } else{
+        callBack(400, {
+            message: 'invalid request'
+        })
+    }
+};
 
 /* export module as external module */
 module.exports = handle;
