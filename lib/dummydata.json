@@ -1,0 +1,30 @@
+[
+    {
+        "firstName": "Hasibul",
+        "lastName": "Islam",
+        "phoneNumber": "01906123456",
+        "password": "abc123XYZ321",
+        "tosAgreement": true
+    },
+    {
+        "firstName": "Salauddin",
+        "lastName": "Ahmed",
+        "phoneNumber": "01720112345",
+        "password": "abc123XYZ321",
+        "tosAgreement": true
+    },
+    {
+        "firstName": "Lily",
+        "lastName": "Ahmed",
+        "phoneNumber": "01778123212",
+        "password": "abc456XYZ321",
+        "tosAgreement": true
+    },
+    {
+        "firstName": "Sanjida",
+        "lastName": "Akter",
+        "phoneNumber": "01740123453",
+        "password": "abc789XYZ321",
+        "tosAgreement": true
+    }
+]
