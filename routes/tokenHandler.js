@@ -121,10 +121,57 @@ handle._token.get = (requestProperties, callBack) => {
 };
 
 /* @TODO: authentication required */
-handle._token.put = (requestProperties, callBack) => { };
+handle._token.put = (requestProperties, callBack) => {
+    // approaching token id
+    const id = typeof requestProperties.userInfo.id === 'string'
+        && requestProperties.userInfo.id.trim().length === 16
+        ? requestProperties.userInfo.id
+        : null;
+
+    // approaching boolean extend to timing token
+    const extend = typeof requestProperties.userInfo.extend === 'boolean'
+        && requestProperties.userInfo.extend === true
+        ? requestProperties.userInfo.extend
+        : false;
+
+    // start validating to be updated
+    if (id && extend) {
+        data.read('tokens', id, (error, tokenData) => {
+            // convert from json to parse object
+            const token = { ...parseJSON(tokenData) };
+            if (token.expiry > Date.now()) {
+                // set new expiry
+                token.expiry = Date.now() + (60 * 60 * 100);
+
+                // store to db
+                data.update('tokens', id, token, (err) => {
+                    if (!err) {
+                        callBack(200, {
+                            message: 'extend expiry'
+                        })
+                    } else {
+                        callBack(500, {
+                            message: 'occurs a server side error'
+                        })
+                    }
+                })
+            } else {
+                callBack(400, {
+                    message: 'token expired'
+                })
+            }
+        })
+    } else {
+        callBack(400, {
+            message: 'token not found'
+        })
+    }
+};
 
 /* @TODO: authentication required */
-handle._token.delete = (requestProperties, callBack) => { };
+handle._token.delete = (requestProperties, callBack) => {
+    
+};
 
 /* export module as external module */
 module.exports = handle;
