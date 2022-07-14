@@ -170,7 +170,38 @@ handle._token.put = (requestProperties, callBack) => {
 
 /* @TODO: authentication required */
 handle._token.delete = (requestProperties, callBack) => {
-    
+    // approaching token id
+    const id = typeof requestProperties.queryStringObject.id === 'string'
+        && requestProperties.queryStringObject.id.trim().length === 16
+        ? requestProperties.queryStringObject.id
+        : null;
+
+    // validate with token id to delete
+    if (id) {
+        data.read('tokens', id, (error, user) => {
+            if (!error && user) {
+                data.delete('tokens', id, err => {
+                    if (!err) {
+                        callBack(200, {
+                            message: 'token deletion success'
+                        })
+                    } else {
+                        callBack(401, {
+                            message: 'credential error'
+                        })
+                    }
+                })
+            } else {
+                callBack(500, {
+                    message: 'server side error'
+                })
+            }
+        })
+    } else {
+        callBack(400, {
+            message: 'invalid request'
+        })
+    }
 };
 
 /* export module as external module */
