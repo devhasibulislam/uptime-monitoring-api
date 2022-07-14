@@ -65,7 +65,7 @@ handle._user.post = (requestProperties, callBack) => {
 
     // validate user info
     if (firstName && lastName && phoneNumber && password && tosAgreement) {
-        data.read('', phoneNumber, (err, userInfo) => {
+        data.read('users', phoneNumber, (err, userInfo) => {
             // no exist in db can exist in db
             if (err) {
                 let userObject = {
@@ -77,7 +77,7 @@ handle._user.post = (requestProperties, callBack) => {
                 };
 
                 // store user to db
-                data.create('', phoneNumber, userObject, er => {
+                data.create('users', phoneNumber, userObject, er => {
                     if (!er) {
                         callBack(200, {
                             message: 'user created successfully'
@@ -111,7 +111,7 @@ handle._user.get = (requestProperties, callBack) => {
 
     // lookup the user
     if (phoneNumber) {
-        data.read('', phoneNumber, (err, usr) => {
+        data.read('users', phoneNumber, (err, usr) => {
             // convert user json to object
             const user = { ...parseJSON(usr) };
 
@@ -166,7 +166,7 @@ handle._user.put = (requestProperties, callBack) => {
         // scope to find out update scheme
         if (firstName || lastName || password) {
             // lookup file from user
-            data.read('', phoneNumber, (error, userData) => {
+            data.read('users', phoneNumber, (error, userData) => {
                 const user = { ...parseJSON(userData) };
                 if (!error && user) {
                     if (firstName) {
@@ -180,7 +180,7 @@ handle._user.put = (requestProperties, callBack) => {
                     }
 
                     // store in db
-                    data.update('', phoneNumber, user, err => {
+                    data.update('users', phoneNumber, user, err => {
                         if (!err) {
                             callBack(200, {
                                 message: "user updated successfully"
@@ -217,9 +217,9 @@ handle._user.delete = (requestProperties, callBack) => {
 
     // validate with phone number to delete
     if(phoneNumber){
-        data.read('', phoneNumber, (error, user)=>{
+        data.read('users', phoneNumber, (error, user)=>{
             if(!error && user){
-                data.delete('', phoneNumber, err =>{
+                data.delete('users', phoneNumber, err =>{
                     if(!err){
                         callBack(200, {
                             message: 'user deletion success'
