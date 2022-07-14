@@ -11,13 +11,15 @@ const environment = {};
 /* set up environment for staging or development purpose */
 environment.staging = {
     port: 3000,
-    envName: 'staging'
+    envName: 'staging',
+    SECRET_KEY: 'c033fc6573a96eecfce1674fad3aacc8',
 }
 
 /* set up environment for production purpose */
 environment.production = {
     port: 5000,
-    envName: 'production'
+    envName: 'production',
+    SECRET_KEY: '5eec4ee7a11b93ac6f830566eff0d690',
 }
 
 /* determined which environment was passed */
