@@ -101,6 +101,7 @@ handle._user.post = (requestProperties, callBack) => {
     }
 };
 
+/* @TODO: authentication required */
 handle._user.get = (requestProperties, callBack) => {
     // approaching phone number
     const phoneNumber = typeof requestProperties.queryStringObject.phoneNumber === 'string'
@@ -134,6 +135,7 @@ handle._user.get = (requestProperties, callBack) => {
 
 };
 
+/* @TODO: authentication required */
 handle._user.put = (requestProperties, callBack) => {
     // approaching first name
     const firstName = typeof requestProperties.userInfo.firstName === 'string'
@@ -205,6 +207,7 @@ handle._user.put = (requestProperties, callBack) => {
     }
 };
 
+/* @TODO: authentication required */
 handle._user.delete = (requestProperties, callBack) => {
     // approaching phone number
     const phoneNumber = typeof requestProperties.queryStringObject.phoneNumber === 'string'
