@@ -8,6 +8,7 @@
 /* dependency */
 const data = require('../lib/data');
 const { hash } = require('../utilities/hashUtils');
+const { parseJSON } = require('../utilities/userUtils');
 
 /* handle user object - module scaffolding */
 const handle = {};
@@ -15,7 +16,7 @@ const handle = {};
 /* creating sample handler function within handle object */
 handle.userHandler = (requestProperties, callBack) => {
     // approaching server methods
-    const acceptedMethod = ['post', 'get', 'put', 'delete'];
+    const acceptedMethod = ['get', 'post', 'put', 'delete'];
 
     // validate getting method
     if (acceptedMethod.indexOf(requestProperties.method) > -1) {
@@ -46,7 +47,7 @@ handle._user.post = (requestProperties, callBack) => {
 
     // approaching phone number
     const phoneNumber = typeof requestProperties.userInfo.phoneNumber === 'string'
-        && requestProperties.userInfo.phoneNumber.trim().length > 0
+        && requestProperties.userInfo.phoneNumber.trim().length === 11
         ? requestProperties.userInfo.phoneNumber
         : null;
 
@@ -101,10 +102,36 @@ handle._user.post = (requestProperties, callBack) => {
 };
 
 handle._user.get = (requestProperties, callBack) => {
-    // callback function to execute the rest
-    callBack(200, {
-        message: "Welcome to user's route!"
-    });
+    // approaching phone number
+    const phoneNumber = typeof requestProperties.queryStringObject.phoneNumber === 'string'
+        && requestProperties.queryStringObject.phoneNumber.trim().length === 11
+        ? requestProperties.queryStringObject.phoneNumber
+        : null;
+
+    // lookup the user
+    if (phoneNumber) {
+        data.read('', phoneNumber, (err, usr) => {
+            // convert user json to object
+            const user = { ...parseJSON(usr) };
+
+            // display user thrown
+            if (!err && user) {
+                // !# display info without user
+                // delete user.password;
+                callBack(200, user);
+            } else {
+                callBack(404, {
+                    message: "interruption in showing user"
+                })
+            }
+        })
+    } else {
+        // callback function to execute the rest
+        callBack(404, {
+            message: "requested user not found"
+        });
+    }
+
 };
 
 handle._user.put = (requestProperties, callBack) => { };
