@@ -8,6 +8,8 @@
 // dependency
 const url = require('url');
 const { StringDecoder } = require('string_decoder');
+const routes = require('../utilities/routes');
+const { notFoundHandler } = require('../routes/notFoundHandler');
 
 // handle object - module scaffolding
 const handler = {};
@@ -33,9 +35,36 @@ handler.handleReqRes = (req, res) => {
     // get headers as an object form
     const headersObject = req.headers;
 
+    // convert to an object of all request properties
+    const requestProperties = {
+        parsedURL,
+        path,
+        trimmedPath,
+        method,
+        queryStringObject,
+        headersObject
+    };
+
     // get requested string
     const decoder = new StringDecoder('utf-8');
     let realData = '';
+
+    // choose route handler
+    const chosenHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundHandler;
+
+    // pass request properties to chosen handler
+    chosenHandler(requestProperties, (statusCode, payload) => {
+        // validate status code and payload
+        statusCode = typeof (statusCode) === 'number' ? statusCode : 500;
+        payload = typeof (payload) === 'object' ? payload : {};
+
+        // convert payload to stringify payload as JSON format
+        const stringifiedPayload = JSON.stringify(payload);
+
+        // return final response
+        res.writeHead(statusCode);
+        res.end(stringifiedPayload);
+    });
 
     req.on('data', (buffer) => {
         realData += decoder.write(buffer);
@@ -50,5 +79,5 @@ handler.handleReqRes = (req, res) => {
     })
 }
 
-// export module as external module
+/* export module as external module */
 module.exports = handler;
