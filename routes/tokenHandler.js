@@ -88,7 +88,37 @@ handle._token.post = (requestProperties, callBack) => {
 };
 
 /* @TODO: authentication required */
-handle._token.get = (requestProperties, callBack) => { };
+handle._token.get = (requestProperties, callBack) => {
+    // approaching toke id
+    const id = typeof requestProperties.queryStringObject.id === 'string'
+        && requestProperties.queryStringObject.id.trim().length === 16
+        ? requestProperties.queryStringObject.id
+        : null;
+
+    // lookup the token
+    if (id) {
+        data.read('tokens', id, (err, tokenData) => {
+            // convert token json to object
+            const token = { ...parseJSON(tokenData) };
+
+            // display token thrown
+            if (!err && token) {
+                // !# display info without token
+                // delete token.password;
+                callBack(200, token);
+            } else {
+                callBack(404, {
+                    message: "interruption in showing token"
+                })
+            }
+        })
+    } else {
+        // callback function to execute the rest
+        callBack(404, {
+            message: "requested token not found"
+        });
+    }
+};
 
 /* @TODO: authentication required */
 handle._token.put = (requestProperties, callBack) => { };
