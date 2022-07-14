@@ -10,6 +10,7 @@ const url = require('url');
 const { StringDecoder } = require('string_decoder');
 const routes = require('../utilities/routes');
 const { notFoundHandler } = require('../routes/notFoundHandler');
+const { parseJSON } = require('../utilities/userUtils');
 
 // handle object - module scaffolding
 const handler = {};
@@ -61,6 +62,9 @@ handler.handleReqRes = (req, res) => {
         // stop writing data on real data file
         realData += decoder.end();
 
+        // add new user object within request property
+        requestProperties["userInfo"] = parseJSON(realData);
+
         // pass request properties to chosen handler
         chosenHandler(requestProperties, (statusCode, payload) => {
             // validate status code and payload
@@ -69,6 +73,9 @@ handler.handleReqRes = (req, res) => {
 
             // convert payload to stringify payload as JSON format
             const stringifiedPayload = JSON.stringify(payload);
+
+            // passed data convert to json format
+            res.setHeader('content-type', 'application/json');
 
             // return final response
             res.writeHead(statusCode);
