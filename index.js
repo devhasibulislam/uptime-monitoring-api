@@ -15,20 +15,24 @@ const data = require('./lib/data');
 const app = {};
 
 /* @testing: removed later */
-// able to write file
+// !# able to write a file
 // data.create('', 'test', {
 //     name: "Hasibul Islam",
 //     id: 1935202062,
 //     dept: "CSE",
-//     institute: 'City University'
 // }, err => {
-//     process.stdout.write(`error is ${err}`);
+//     console.log(`error is ${err}`);
 // })
 
-// able to read file
-data.read('', 'test', (error, data) => {
-    console.log(error, data);
-})
+// !# able to read a file
+// data.read('', 'test', (error, data) => {
+//     console.log(error, data);
+// })
+
+// !# able to update a file
+// data.update('', 'test', { institute: 'City University' }, err => {
+//     console.log(`error is ${err}`);
+// })
 
 /* create server */
 app.createServer = () => {
