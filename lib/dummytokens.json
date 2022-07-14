@@ -1,0 +1,18 @@
+[
+    {
+        "phoneNumber": "01906123456",
+        "password": "abc123XYZ321"
+    },
+    {
+        "phoneNumber": "01720112345",
+        "password": "abc123XYZ321"
+    },
+    {
+        "phoneNumber": "01778123212",
+        "password": "abc456XYZ321"
+    },
+    {
+        "phoneNumber": "01740123453",
+        "password": "abc789XYZ321"
+    }
+]
