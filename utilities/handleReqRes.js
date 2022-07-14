@@ -52,30 +52,28 @@ handler.handleReqRes = (req, res) => {
     // choose route handler
     const chosenHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundHandler;
 
-    // pass request properties to chosen handler
-    chosenHandler(requestProperties, (statusCode, payload) => {
-        // validate status code and payload
-        statusCode = typeof (statusCode) === 'number' ? statusCode : 500;
-        payload = typeof (payload) === 'object' ? payload : {};
-
-        // convert payload to stringify payload as JSON format
-        const stringifiedPayload = JSON.stringify(payload);
-
-        // return final response
-        res.writeHead(statusCode);
-        res.end(stringifiedPayload);
-    });
-
     req.on('data', (buffer) => {
+        // start writing data on real data file
         realData += decoder.write(buffer);
     });
 
     req.on('end', () => {
+        // stop writing data on real data file
         realData += decoder.end();
-        console.log(realData);
 
-        // response handled
-        res.end('Project server connected successfully!');
+        // pass request properties to chosen handler
+        chosenHandler(requestProperties, (statusCode, payload) => {
+            // validate status code and payload
+            statusCode = typeof (statusCode) === 'number' ? statusCode : 500;
+            payload = typeof (payload) === 'object' ? payload : {};
+
+            // convert payload to stringify payload as JSON format
+            const stringifiedPayload = JSON.stringify(payload);
+
+            // return final response
+            res.writeHead(statusCode);
+            res.end(stringifiedPayload);
+        });
     })
 }
 
