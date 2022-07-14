@@ -34,6 +34,11 @@ const app = {};
 //     console.log(`error is ${err}`);
 // })
 
+// !# able to delete an existing file
+// data.delete('', 'test', err => {
+//     console.log(err);
+// })
+
 /* create server */
 app.createServer = () => {
     http.createServer(app.handleReqRes).listen(environment.port, () => {
