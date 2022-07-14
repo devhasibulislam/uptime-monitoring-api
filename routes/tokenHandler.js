@@ -32,7 +32,7 @@ handle.tokenHandler = (requestProperties, callBack) => {
 /* user secret object - module scaffolding */
 handle._token = {};
 
-/* let fetch with methods */
+/* POST method */
 handle._token.post = (requestProperties, callBack) => {
     // approaching phone number
     const phoneNumber = typeof requestProperties.userInfo.phoneNumber === 'string'
@@ -87,7 +87,7 @@ handle._token.post = (requestProperties, callBack) => {
     }
 };
 
-/* @TODO: authentication required */
+/* GET method */
 handle._token.get = (requestProperties, callBack) => {
     // approaching toke id
     const id = typeof requestProperties.queryStringObject.id === 'string'
@@ -120,7 +120,7 @@ handle._token.get = (requestProperties, callBack) => {
     }
 };
 
-/* @TODO: authentication required */
+/* PUT method */
 handle._token.put = (requestProperties, callBack) => {
     // approaching token id
     const id = typeof requestProperties.userInfo.id === 'string'
@@ -168,7 +168,7 @@ handle._token.put = (requestProperties, callBack) => {
     }
 };
 
-/* @TODO: authentication required */
+/* DELETE method */
 handle._token.delete = (requestProperties, callBack) => {
     // approaching token id
     const id = typeof requestProperties.queryStringObject.id === 'string'
@@ -203,6 +203,25 @@ handle._token.delete = (requestProperties, callBack) => {
         })
     }
 };
+
+/* verify token */
+handle._token.verify = (id, phoneNumber, callBack) => {
+    data.read('tokens', id, (error, tokenData) => {
+        if (!error && tokenData) {
+            // convert json format to parse object
+            const token = { ...parseJSON(tokenData) };
+
+            // validate token data
+            if ((token.phoneNumber === phoneNumber) && (token.expiry > Date.now())) {
+                callBack(true); 
+            } else {
+                callBack(false);
+            }
+        } else {
+            callBack(false);
+        }
+    })
+}
 
 /* export module as external module */
 module.exports = handle;
