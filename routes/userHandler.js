@@ -9,6 +9,7 @@
 const data = require('../lib/data');
 const { hash } = require('../utilities/hashUtils');
 const { parseJSON } = require('../utilities/userUtils');
+const tokenHandler = require('../routes/tokenHandler');
 
 /* handle user object - module scaffolding */
 const handle = {};
@@ -101,7 +102,7 @@ handle._user.post = (requestProperties, callBack) => {
     }
 };
 
-/* @TODO: authentication required */
+/* authentication adding done */
 handle._user.get = (requestProperties, callBack) => {
     // approaching phone number
     const phoneNumber = typeof requestProperties.queryStringObject.phoneNumber === 'string'
@@ -111,21 +112,35 @@ handle._user.get = (requestProperties, callBack) => {
 
     // lookup the user
     if (phoneNumber) {
-        data.read('users', phoneNumber, (err, usr) => {
-            // convert user json to object
-            const user = { ...parseJSON(usr) };
+        // verify token
+        const token = typeof requestProperties.headersObject.token === 'string'
+            ? requestProperties.headersObject.token
+            : false;
 
-            // display user thrown
-            if (!err && user) {
-                // !# display info without user
-                // delete user.password;
-                callBack(200, user);
+        tokenHandler._token.verify(token, phoneNumber, (tokenID) => {
+            if (tokenID) {
+                // lookup the user
+                data.read('users', phoneNumber, (err, usr) => {
+                    // convert user json to object
+                    const user = { ...parseJSON(usr) };
+
+                    // display user thrown
+                    if (!err && user) {
+                        // !# display info without user
+                        // delete user.password;
+                        callBack(200, user);
+                    } else {
+                        callBack(404, {
+                            message: "interruption in showing user"
+                        })
+                    }
+                })
             } else {
-                callBack(404, {
-                    message: "interruption in showing user"
+                callBack(403, {
+                    message: "authentication failed"
                 })
             }
-        })
+        });
     } else {
         // callback function to execute the rest
         callBack(404, {
@@ -134,7 +149,7 @@ handle._user.get = (requestProperties, callBack) => {
     }
 };
 
-/* @TODO: authentication required */
+/* authentication adding done */
 handle._user.put = (requestProperties, callBack) => {
     // approaching first name
     const firstName = typeof requestProperties.userInfo.firstName === 'string'
@@ -164,36 +179,49 @@ handle._user.put = (requestProperties, callBack) => {
     if (phoneNumber) {
         // scope to find out update scheme
         if (firstName || lastName || password) {
-            // lookup file from user
-            data.read('users', phoneNumber, (error, userData) => {
-                const user = { ...parseJSON(userData) };
-                if (!error && user) {
-                    if (firstName) {
-                        user.firstName = firstName;
-                    }
-                    if (lastName) {
-                        user.lastName = lastName;
-                    }
-                    if (password) {
-                        user.password = hash(password);
-                    }
+            // verify token
+            const token = typeof requestProperties.headersObject.token === 'string'
+                ? requestProperties.headersObject.token
+                : false;
 
-                    // store in db
-                    data.update('users', phoneNumber, user, err => {
-                        if (!err) {
-                            callBack(200, {
-                                message: "user updated successfully"
+            tokenHandler._token.verify(token, phoneNumber, (tokenID) => {
+                if (tokenID) {
+                    // lookup file from user
+                    data.read('users', phoneNumber, (error, userData) => {
+                        const user = { ...parseJSON(userData) };
+                        if (!error && user) {
+                            if (firstName) {
+                                user.firstName = firstName;
+                            }
+                            if (lastName) {
+                                user.lastName = lastName;
+                            }
+                            if (password) {
+                                user.password = hash(password);
+                            }
+
+                            // store in db
+                            data.update('users', phoneNumber, user, err => {
+                                if (!err) {
+                                    callBack(200, {
+                                        message: "user updated successfully"
+                                    })
+                                } else {
+                                    callBack(500, {
+                                        message: 'error occurs in server side'
+                                    })
+                                }
                             })
                         } else {
-                            callBack(500, {
-                                message: 'error occurs in server side'
-                            })
+                            callBack(401, 'user info integration invalid')
                         }
                     })
                 } else {
-                    callBack(401, 'user info integration invalid')
+                    callBack(403, {
+                        message: "authentication failed"
+                    })
                 }
-            })
+            });
         } else {
             callBack(401, {
                 message: 'update scheme not valid'
@@ -206,7 +234,7 @@ handle._user.put = (requestProperties, callBack) => {
     }
 };
 
-/* @TODO: authentication required */
+/* authentication adding done */
 handle._user.delete = (requestProperties, callBack) => {
     // approaching phone number
     const phoneNumber = typeof requestProperties.queryStringObject.phoneNumber === 'string'
@@ -215,27 +243,41 @@ handle._user.delete = (requestProperties, callBack) => {
         : null;
 
     // validate with phone number to delete
-    if(phoneNumber){
-        data.read('users', phoneNumber, (error, user)=>{
-            if(!error && user){
-                data.delete('users', phoneNumber, err =>{
-                    if(!err){
-                        callBack(200, {
-                            message: 'user deletion success'
+    if (phoneNumber) {
+        // verify token
+        const token = typeof requestProperties.headersObject.token === 'string'
+            ? requestProperties.headersObject.token
+            : false;
+
+        tokenHandler._token.verify(token, phoneNumber, (tokenID) => {
+            if (tokenID) {
+                // lookup the user
+                data.read('users', phoneNumber, (error, user) => {
+                    if (!error && user) {
+                        data.delete('users', phoneNumber, err => {
+                            if (!err) {
+                                callBack(200, {
+                                    message: 'user deletion success'
+                                })
+                            } else {
+                                callBack(401, {
+                                    message: 'credential error'
+                                })
+                            }
                         })
-                    } else{
-                        callBack(401, {
-                            message: 'credential error'
+                    } else {
+                        callBack(500, {
+                            message: 'server side error'
                         })
                     }
                 })
-            } else{
-                callBack(500, {
-                    message: 'server side error'
+            } else {
+                callBack(403, {
+                    message: "authentication failed"
                 })
             }
-        })
-    } else{
+        });
+    } else {
         callBack(400, {
             message: 'invalid request'
         })
