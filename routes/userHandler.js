@@ -132,7 +132,6 @@ handle._user.get = (requestProperties, callBack) => {
             message: "requested user not found"
         });
     }
-
 };
 
 /* @TODO: authentication required */
