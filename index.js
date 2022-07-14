@@ -15,7 +15,8 @@ const data = require('./lib/data');
 const app = {};
 
 /* @testing: removed later */
-// data.create('', 'newFile', {
+// able to write file
+// data.create('', 'test', {
 //     name: "Hasibul Islam",
 //     id: 1935202062,
 //     dept: "CSE",
@@ -23,6 +24,11 @@ const app = {};
 // }, err => {
 //     process.stdout.write(`error is ${err}`);
 // })
+
+// able to read file
+data.read('', 'test', (error, data) => {
+    console.log(error, data);
+})
 
 /* create server */
 app.createServer = () => {
