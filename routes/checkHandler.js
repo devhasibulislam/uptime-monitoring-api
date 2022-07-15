@@ -164,7 +164,43 @@ handle._check.post = (requestProperties, callBack) => {
 };
 
 /* authentication adding done */
-handle._check.get = (requestProperties, callBack) => { };
+handle._check.get = (requestProperties, callBack) => {
+    // validate query id
+    const id = typeof requestProperties.queryStringObject.id === 'string'
+        && requestProperties.queryStringObject.id.trim().length === 16
+        ? requestProperties.queryStringObject.id
+        : null;
+
+    if (id) {
+        // look up the check
+        data.read('checks', id, (error, tokenData) => {
+            if (!error && tokenData) {
+                // verify token
+                const token = typeof requestProperties.headersObject.token === 'string'
+                    ? requestProperties.headersObject.token
+                    : false;
+
+                tokenHandler._token.verify(token, parseJSON(tokenData).phoneNumber, isValid => {
+                    if (isValid) {
+                        callBack(200, parseJSON(tokenData));
+                    } else {
+                        callBack(403, {
+                            error: 'forbidden request'
+                        })
+                    }
+                })
+            } else{
+                callBack(500, {
+                    error: 'internal error'
+                })
+            }
+        })
+    } else {
+        callBack(400, {
+            error: 'invalid request'
+        })
+    }
+};
 
 /* authentication adding done */
 handle._check.put = (requestProperties, callBack) => { };
