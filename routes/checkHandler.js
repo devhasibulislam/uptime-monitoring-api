@@ -302,7 +302,88 @@ handle._check.put = (requestProperties, callBack) => {
 };
 
 /* authentication adding done */
-handle._check.delete = (requestProperties, callBack) => { };
+handle._check.delete = (requestProperties, callBack) => {
+    // validate query id
+    const id = typeof requestProperties.queryStringObject.id === 'string'
+        && requestProperties.queryStringObject.id.trim().length === 16
+        ? requestProperties.queryStringObject.id
+        : null;
+
+    if (id) {
+        // look up the check
+        data.read('checks', id, (error, tokenData) => {
+            if (!error && tokenData) {
+                // verify token
+                const token = typeof requestProperties.headersObject.token === 'string'
+                    ? requestProperties.headersObject.token
+                    : false;
+
+                tokenHandler._token.verify(token, parseJSON(tokenData).phoneNumber, isValid => {
+                    if (isValid) {
+                        // delete the check data
+                        data.delete('checks', id, err => {
+                            if (!err) {
+                                data.read('users', parseJSON(tokenData).phoneNumber, (err, userData) => {
+                                    if (!err && userData) {
+                                        const user = parseJSON(userData);
+                                        const checks = typeof user.checks === 'object'
+                                            && user.checks instanceof Array
+                                            ? user.checks
+                                            : [];
+
+                                        // remove check id from user list
+                                        const position = checks.indexOf(id);
+                                        if (position > -1) {
+                                            checks.splice(position, 1);
+
+                                            // re save to user
+                                            user.checks = checks;
+                                            data.update('users', user.phoneNumber, user, er => {
+                                                if(!er){
+                                                    callBack(200, {
+                                                        message: 'success request'
+                                                    })
+                                                } else{
+                                                    callBack(401, {
+                                                        error: 'unauthorized request'
+                                                    })
+                                                }
+                                            })
+                                        } else {
+                                            callBack(403, {
+                                                error: 'forbidden permission'
+                                            })
+                                        }
+                                    } else {
+                                        callBack(500, {
+                                            error: 'internal error'
+                                        })
+                                    }
+                                })
+                            } else {
+                                callBack(401, {
+                                    error: 'unauthorized access'
+                                })
+                            }
+                        })
+                    } else {
+                        callBack(403, {
+                            error: 'forbidden request'
+                        })
+                    }
+                })
+            } else {
+                callBack(500, {
+                    error: 'internal error'
+                })
+            }
+        })
+    } else {
+        callBack(400, {
+            error: 'invalid request'
+        })
+    }
+};
 
 /* export module as external module */
 module.exports = handle;
