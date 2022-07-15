@@ -5,5 +5,26 @@
         "method": "GET",
         "successCode": [200, 201],
         "timeOutSeconds": 2
+    },
+    {
+        "protocol": "https",
+        "url": "facebook.com",
+        "method": "GET",
+        "successCode": [200, 201],
+        "timeOutSeconds": 2
+    },
+    {
+        "protocol": "http",
+        "url": "yahoo.com",
+        "method": "GET",
+        "successCode": [200, 201],
+        "timeOutSeconds": 2
+    },
+    {
+        "protocol": "https",
+        "url": "youtube.com",
+        "method": "GET",
+        "successCode": [200, 201],
+        "timeOutSeconds": 2
     }
 ]
