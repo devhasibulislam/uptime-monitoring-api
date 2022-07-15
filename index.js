@@ -1,27 +1,28 @@
 /**
- * Title: Simple NodeJS project
- * Description: A RESTful API to monitor up and down time of a URL
+ * Title: Project initial file
+ * Description: Initial file to start the server & worker
  * Author: Hasibul Islam
- * Date: 13/07/2022
+ * Date: 15/07/2022 [updated]
  */
 
 /* dependencies */
-const http = require('http');
-const { handleReqRes } = require('./utilities/handleReqRes');
-const environment = require('./utilities/environment');
+const server = require('./lib/server');
+const worker = require('./lib/worker');
 
 /* app object - module scaffolding */
 const app = {};
 
-/* create server */
-app.createServer = () => {
-    http.createServer(app.handleReqRes).listen(environment.port, () => {
-        console.log(`Project server listening on port ${environment.port}`);
-    })
+/* initialization to start server & worker */
+app.init = () => {
+    // start the server
+    server.init();
+
+    // start the worker
+    worker.init();
 }
 
-/* handle request response */
-app.handleReqRes = handleReqRes;
+/* start the project initial file */
+app.init();
 
-/* start the server */
-app.createServer();
+/* export the app module */
+module.exports = app;
