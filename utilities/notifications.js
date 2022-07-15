@@ -44,7 +44,7 @@ notifications.sendTwilioSMS = (phoneNumber, messageBody, callBack) => {
             path: `/2010-04-01/Accounts/${twilio.accountSID}/Messages.json`,
             auth: `${twilio.accountSID}:${twilio.authToken}`,
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'content-type': 'application/x-www-form-urlencoded',
             },
         }
 
