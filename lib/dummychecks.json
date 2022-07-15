@@ -1,0 +1,9 @@
+[
+    {
+        "protocol": "http",
+        "url": "google.com",
+        "method": "GET",
+        "successCode": [200, 201],
+        "timeOutSeconds": 2
+    }
+]
