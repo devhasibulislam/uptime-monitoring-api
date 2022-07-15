@@ -189,7 +189,7 @@ handle._check.get = (requestProperties, callBack) => {
                         })
                     }
                 })
-            } else{
+            } else {
                 callBack(500, {
                     error: 'internal error'
                 })
@@ -203,7 +203,103 @@ handle._check.get = (requestProperties, callBack) => {
 };
 
 /* authentication adding done */
-handle._check.put = (requestProperties, callBack) => { };
+handle._check.put = (requestProperties, callBack) => {
+    // approaching token id
+    const id = typeof requestProperties.userInfo.id === 'string'
+        && requestProperties.userInfo.id.trim().length === 16
+        ? requestProperties.userInfo.id
+        : null;
+
+    // validate inputs
+    const protocol = typeof requestProperties.userInfo.protocol === 'string'
+        && ['http', 'https'].indexOf(requestProperties.userInfo.protocol) > -1
+        ? requestProperties.userInfo.protocol
+        : null;
+
+    const url = typeof requestProperties.userInfo.url === 'string'
+        && requestProperties.userInfo.url.trim().length > 0
+        ? requestProperties.userInfo.url
+        : null;
+
+    const method = typeof requestProperties.userInfo.method === 'string'
+        && ['POST', 'GET', 'PUT', 'DELETE'].indexOf(requestProperties.userInfo.method) > -1
+        ? requestProperties.userInfo.method
+        : null;
+
+    const successCode = typeof requestProperties.userInfo.successCode === 'object'
+        && requestProperties.userInfo.successCode instanceof Array
+        ? requestProperties.userInfo.successCode
+        : null;
+
+    const timeOutSeconds = typeof requestProperties.userInfo.timeOutSeconds === 'number'
+        && requestProperties.userInfo.timeOutSeconds % 1 === 0
+        && requestProperties.userInfo.timeOutSeconds >= 1
+        && requestProperties.userInfo.timeOutSeconds <= 5
+        ? requestProperties.userInfo.timeOutSeconds
+        : null;
+
+    // go through checking out id
+    if (id) {
+        if (protocol || url || method || successCode || timeOutSeconds) {
+            data.read('checks', id, (error, checksData) => {
+                if (!error && checksData) {
+                    // convert from json to parse
+                    const check = parseJSON(checksData);
+
+                    // verify token
+                    const token = typeof requestProperties.headersObject.token === 'string'
+                        ? requestProperties.headersObject.token
+                        : false;
+
+                    tokenHandler._token.verify(token, check.phoneNumber, isValid => {
+                        if (isValid) {
+                            if (protocol) {
+                                check.protocol = protocol;
+                            }
+                            if (url) {
+                                check.url = url;
+                            }
+                            if (method) {
+                                check.method = method;
+                            }
+                            if (successCode) {
+                                check.successCode = successCode;
+                            }
+                            if (timeOutSeconds) {
+                                check.timeOutSeconds = timeOutSeconds;
+                            }
+
+                            // update the check object to db
+                            data.update('checks', id, check, err => {
+                                if (!err) {
+                                    callBack(200, {
+                                        message: 'success response'
+                                    })
+                                } else {
+                                    callBack(401, {
+                                        error: 'unauthorized token'
+                                    })
+                                }
+                            })
+                        } else {
+                            callBack(403, {
+                                error: 'forbidden request'
+                            })
+                        }
+                    })
+                } else {
+                    callBack(500, {
+                        error: 'internal error'
+                    })
+                }
+            })
+        }
+    } else {
+        callBack(400, {
+            error: 'invalid request'
+        })
+    }
+};
 
 /* authentication adding done */
 handle._check.delete = (requestProperties, callBack) => { };
